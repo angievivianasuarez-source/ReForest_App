@@ -1,0 +1,30 @@
+import { expect, test } from '@playwright/test';
+
+test('PI-01: registro real, contrato público y correo duplicado', async ({ page, request }) => {
+  const health = await request.get('http://127.0.0.1:8000/health');
+  expect(health.status()).toBe(200);
+  const correo = `pi01-${Date.now()}@example.com`;
+  await page.goto('/registro');
+  await page.getByLabel('Nombre', { exact: true }).fill('María Niño');
+  await page.getByLabel('Correo electrónico').fill(correo);
+  await page.getByLabel('Contraseña', { exact: true }).fill('una-clave-segura');
+  await page.getByLabel('Quiero participar como').selectOption('VOLUNTARIO');
+  const created = page.waitForResponse(r => r.url().endsWith('/auth/register') && r.request().method() === 'POST');
+  await page.getByRole('button', { name: 'Crear cuenta' }).click();
+  const response = await created;
+  expect(response.status()).toBe(201);
+  const user = await response.json();
+  expect(Object.keys(user).sort()).toEqual(['correo', 'id', 'nombre', 'rol']);
+  expect(user.correo).toBe(correo);
+  expect(user.rol).toBe('VOLUNTARIO');
+  await expect(page.getByRole('status')).toContainText('creada correctamente');
+  await page.getByLabel('Nombre', { exact: true }).fill('María Niño');
+  await page.getByLabel('Correo electrónico').fill(correo);
+  await page.getByLabel('Contraseña', { exact: true }).fill('una-clave-segura');
+  const duplicated = page.waitForResponse(r => r.url().endsWith('/auth/register') && r.request().method() === 'POST');
+  await page.getByRole('button', { name: 'Crear cuenta' }).click();
+  expect((await duplicated).status()).toBe(409);
+  await expect(page.getByRole('status')).toContainText('ya está registrado');
+  const forbidden = await request.post('http://127.0.0.1:8000/api/v1/auth/register', { data: { nombre: 'Prueba', correo: `admin-${correo}`, password: 'una-clave-segura', rol: 'ADMINISTRADOR' } });
+  expect(forbidden.status()).toBe(422);
+});

@@ -1,0 +1,12 @@
+<main class="page">
+<header class="brand"><span class="brand-mark" aria-hidden="true">R</span><span>ReForest</span></header>
+<section class="layout" aria-labelledby="register-title">
+<div class="intro"><span class="eyebrow">UNA COMUNIDAD QUE CRECE</span><h1>El cambio empieza<br>con una semilla.</h1><p>Únete a ReForest y participa en el cuidado de nuestros bosques.</p><div class="leaf" aria-hidden="true">↗</div><p class="caption">Reporta. Participa. Contribuye.</p></div>
+<div class="card"><span class="eyebrow">BIENVENIDO A REFOREST</span><h2 id="register-title">Crea tu cuenta</h2><p class="description">Completa tus datos y elige cómo quieres participar.</p>
+<form [formGroup]="form" (ngSubmit)="submit()" novalidate [attr.aria-busy]="pending()"><fieldset [disabled]="pending()">
+<label for="nombre">Nombre</label><input id="nombre" formControlName="nombre" autocomplete="name" maxlength="120" [attr.aria-invalid]="invalid('nombre')" aria-describedby="nombre-error"><p id="nombre-error" class="field-error">@if (invalid('nombre')) { Escribe un nombre de hasta 120 caracteres. }</p>
+<label for="correo">Correo electrónico</label><input id="correo" formControlName="correo" type="email" autocomplete="email" maxlength="254" [attr.aria-invalid]="invalid('correo')" aria-describedby="correo-error"><p id="correo-error" class="field-error">@if (invalid('correo')) { Escribe un correo electrónico válido. }</p>
+<label for="password">Contraseña</label><input id="password" formControlName="password" type="password" autocomplete="new-password" maxlength="128" [attr.aria-invalid]="invalid('password')" aria-describedby="password-help password-error"><p id="password-help" class="hint">Entre 8 y 128 caracteres. No uses solo espacios.</p><p id="password-error" class="field-error">@if (invalid('password')) { Revisa la longitud y el contenido de tu contraseña. }</p>
+<label for="rol">Quiero participar como</label><select id="rol" formControlName="rol" [attr.aria-invalid]="invalid('rol')" aria-describedby="rol-error">@for (role of roles; track role.value) { <option [value]="role.value">{{ role.label }}</option> }</select><p id="rol-error" class="field-error">@if (invalid('rol')) { Selecciona un rol permitido. }</p>
+<button type="submit">{{ pending() ? 'Creando cuenta…' : 'Crear cuenta' }}</button></fieldset><p class="feedback" [class.success]="success()" role="status" aria-live="polite">{{ message() }}</p></form>
+</div></section><footer>Pequeñas acciones. Un futuro más verde.</footer></main>
